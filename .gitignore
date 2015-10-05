@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+# UE 4.8
+Binaries/
+Content/
+Intermediate/
+
