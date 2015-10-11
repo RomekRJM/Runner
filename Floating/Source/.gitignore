@@ -29,12 +29,6 @@
 
 # UE 4.8
 Binaries/
-Build/
-Config/
 Content/
 Intermediate/
-Saved/
-*.sdf
-*.sln
-*.uproject
-*.v12.suo
+
