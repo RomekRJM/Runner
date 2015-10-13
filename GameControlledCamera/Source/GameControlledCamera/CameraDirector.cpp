@@ -26,13 +26,13 @@ void ACameraDirector::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	/**FVector NewLocation = GetActorLocation();
+	FVector NewLocation = MovingActor->GetActorLocation();
 
 	float DeltaMove = FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime);
-	NewLocation.Z += 1;
-	SetActorLocation(NewLocation);
+	NewLocation.Z += DeltaMove * 20;
+	MovingActor->SetActorLocation(NewLocation);
 
-	RunningTime += DeltaTime;**/
+	RunningTime += DeltaTime;
 
 	const float TimeBetweenCameraChanges = 2.0f;
 	const float SmoothBlendTime = 0.75f;
