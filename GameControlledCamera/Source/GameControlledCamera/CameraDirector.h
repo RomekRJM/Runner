@@ -20,12 +20,18 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	UPROPERTY(EditAnywhere)
-	AActor* CameraOne;
+	static const int cameras_number = 4;
 
 	UPROPERTY(EditAnywhere)
-	AActor* CameraTwo;
+	AActor* Cameras[cameras_number];
+
+	AActor** Camera;
+	int n;
+
+	//UPROPERTY(EditAnywhere)
+	//AActor* CameraTwo;
 
 	float TimeToNextCameraChange;
+	float RunningTime;
 	
 };

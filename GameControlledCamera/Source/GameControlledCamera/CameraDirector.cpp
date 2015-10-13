@@ -10,7 +10,8 @@ ACameraDirector::ACameraDirector()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	Camera = Cameras;
+	n = 0;
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +26,14 @@ void ACameraDirector::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	/**FVector NewLocation = GetActorLocation();
+
+	float DeltaMove = FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime);
+	NewLocation.Z += 1;
+	SetActorLocation(NewLocation);
+
+	RunningTime += DeltaTime;**/
+
 	const float TimeBetweenCameraChanges = 2.0f;
 	const float SmoothBlendTime = 0.75f;
 	TimeToNextCameraChange -= DeltaTime;
@@ -36,15 +45,29 @@ void ACameraDirector::Tick( float DeltaTime )
 		APlayerController* OurPlayerController = UGameplayStatics::GetPlayerController(this, 0);
 		if (OurPlayerController)
 		{
-			if ((OurPlayerController->GetViewTarget() != CameraOne) && (CameraOne != nullptr))
+			if ((OurPlayerController->GetViewTarget() != *Camera) && (*Camera != nullptr))
 			{
-				// Cut instantly to camera one.
-				OurPlayerController->SetViewTarget(CameraOne);
+				if (n == 0)
+				{
+					// Cut instantly to camera
+					OurPlayerController->SetViewTarget(*Camera);
+				}
+				else 
+				{
+					// Blend smoothly to camera two.
+					OurPlayerController->SetViewTargetWithBlend(*Camera, SmoothBlendTime);
+				}
 			}
-			else if ((OurPlayerController->GetViewTarget() != CameraTwo) && (CameraTwo != nullptr))
+			++n;
+
+			if (n < cameras_number)
 			{
-				// Blend smoothly to camera two.
-				OurPlayerController->SetViewTargetWithBlend(CameraTwo, SmoothBlendTime);
+				++Camera;
+			}
+			else
+			{
+				Camera = Cameras;
+				n = 0;
 			}
 		}
 	}
