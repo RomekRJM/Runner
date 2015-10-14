@@ -5,6 +5,24 @@
 #include "GameFramework/Actor.h"
 #include "CameraDirector.generated.h"
 
+USTRUCT()
+struct FCameraBlend
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere)
+	AActor* Camera;
+
+	UPROPERTY(EditAnywhere)
+	float BlendTime;
+
+	FCameraBlend()
+	{
+		BlendTime = 2.0f;
+		Camera = NULL;
+	}
+};
+
 UCLASS()
 class GAMECONTROLLEDCAMERA_API ACameraDirector : public AActor
 {
@@ -20,12 +38,9 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	static const int cameras_number = 5;
+	static const int cameras_number = 6;
 
-	UPROPERTY(EditAnywhere)
-	AActor* Cameras[cameras_number];
-
-	AActor** Camera;
+	FCameraBlend* CameraBlend;
 	int n;
 
 	UPROPERTY(EditAnywhere)
@@ -33,5 +48,12 @@ public:
 
 	float TimeToNextCameraChange;
 	float RunningTime;
+
+	UPROPERTY(EditAnywhere)
+	FCameraBlend CameraBlends[cameras_number];
+
+	void MoveActor(float DeltaTime);
+	void BlendCameras(float DeltaTime);
 	
 };
+

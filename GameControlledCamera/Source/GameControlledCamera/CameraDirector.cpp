@@ -10,7 +10,7 @@ ACameraDirector::ACameraDirector()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Camera = Cameras;
+	CameraBlend = CameraBlends;
 	n = 0;
 }
 
@@ -21,11 +21,7 @@ void ACameraDirector::BeginPlay()
 	
 }
 
-// Called every frame
-void ACameraDirector::Tick( float DeltaTime )
-{
-	Super::Tick( DeltaTime );
-
+void ACameraDirector::MoveActor(float DeltaTime) {
 	FVector NewLocation = MovingActor->GetActorLocation();
 
 	float DeltaMove = FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime);
@@ -33,7 +29,10 @@ void ACameraDirector::Tick( float DeltaTime )
 	MovingActor->SetActorLocation(NewLocation);
 
 	RunningTime += DeltaTime;
+}
 
+void ACameraDirector::BlendCameras(float DeltaTime)
+{
 	const float TimeBetweenCameraChanges = 2.0f;
 	const float SmoothBlendTime = 0.75f;
 	TimeToNextCameraChange -= DeltaTime;
@@ -45,30 +44,32 @@ void ACameraDirector::Tick( float DeltaTime )
 		APlayerController* OurPlayerController = UGameplayStatics::GetPlayerController(this, 0);
 		if (OurPlayerController)
 		{
-			if ((OurPlayerController->GetViewTarget() != *Camera) && (*Camera != nullptr))
+			if ((OurPlayerController->GetViewTarget() != CameraBlend->Camera) && (CameraBlend->Camera != nullptr))
 			{
-				if (n == 0)
-				{
-					// Cut instantly to camera
-					OurPlayerController->SetViewTarget(*Camera);
-				}
-				else 
-				{
-					// Blend smoothly to camera two.
-					OurPlayerController->SetViewTargetWithBlend(*Camera, SmoothBlendTime);
-				}
+				OurPlayerController->SetViewTargetWithBlend(CameraBlend->Camera, CameraBlend->BlendTime);
 			}
 			++n;
 
 			if (n < cameras_number)
 			{
-				++Camera;
+				++CameraBlend;
 			}
 			else
 			{
-				Camera = Cameras;
+				CameraBlend = CameraBlends;
 				n = 0;
 			}
 		}
 	}
 }
+
+// Called every frame
+void ACameraDirector::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	MoveActor(DeltaTime);
+	BlendCameras(DeltaTime);
+}
+
+
