@@ -16,8 +16,8 @@ ADoor::ADoor()
 void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
-	CountdownTime = 50;
-	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ADoor::AdvanceTimer, 0.07f, true);
+	Direction = 1;
+	this->ResetTimer();
 }
 
 // Called every frame
@@ -45,12 +45,18 @@ void ADoor::UpdateDoorPosition()
 	FVector pivot = GetPivotOffset();
 	pivot.Y -= 80.0;
 	SetPivotOffset(pivot);
-	rotation.Add(0, 0.7, 0);
+	rotation.Add(0, 0.7 * Direction, 0);
 	SetActorRotation(rotation);
 }
 
 void ADoor::CountdownHasFinished_Implementation()
 {
-	// invoke closing event
+	Direction *= -1;
+	this->ResetTimer();
 }
 
+void ADoor::ResetTimer()
+{
+	CountdownTime = 50;
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ADoor::AdvanceTimer, 0.07f, true);
+}

@@ -32,5 +32,11 @@ public:
 	void CountdownHasFinished();
 
 	virtual void CountdownHasFinished_Implementation();
+
+	void ResetTimer();
+
+private:
+
+	float Direction;
 	
 };
