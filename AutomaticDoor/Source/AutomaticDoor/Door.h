@@ -20,6 +20,17 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	bool Opened;
+	void AdvanceTimer();
+
+	FTimerHandle CountdownTimerHandle;
+
+	int CountdownTime;
+
+	void UpdateDoorPosition();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void CountdownHasFinished();
+
+	virtual void CountdownHasFinished_Implementation();
 	
 };

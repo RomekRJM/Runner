@@ -8,7 +8,7 @@
 ADoor::ADoor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 }
 
@@ -16,26 +16,41 @@ ADoor::ADoor()
 void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
-	Opened = false;
+	CountdownTime = 6;
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ADoor::AdvanceTimer, 1.0f, true);
 }
 
 // Called every frame
 void ADoor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+}
 
-	if (!Opened) 
+void ADoor::AdvanceTimer()
+{
+	--CountdownTime;
+	if (CountdownTime < 1)
 	{
-		Opened = true;
-	} 
-	else
-	{
-		return;
+		CountdownHasFinished();
 	}
+	else 
+	{
+		UpdateDoorPosition();
+	}
+}
 
+void ADoor::UpdateDoorPosition()
+{
 	FRotator rotation = GetActorRotation();
-	rotation.Add(0,60,0);
+	FVector pivot = GetPivotOffset();
+	pivot.Y -= 80.0;
+	SetPivotOffset(pivot);
+	rotation.Add(0, 10, 0);
 	SetActorRotation(rotation);
+}
 
+void ADoor::CountdownHasFinished_Implementation()
+{
+	// invoke closing event
 }
 
