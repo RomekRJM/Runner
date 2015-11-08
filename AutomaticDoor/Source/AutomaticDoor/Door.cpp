@@ -16,8 +16,8 @@ ADoor::ADoor()
 void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
-	CountdownTime = 6;
-	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ADoor::AdvanceTimer, 1.0f, true);
+	CountdownTime = 50;
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ADoor::AdvanceTimer, 0.07f, true);
 }
 
 // Called every frame
@@ -45,7 +45,7 @@ void ADoor::UpdateDoorPosition()
 	FVector pivot = GetPivotOffset();
 	pivot.Y -= 80.0;
 	SetPivotOffset(pivot);
-	rotation.Add(0, 10, 0);
+	rotation.Add(0, 0.7, 0);
 	SetActorRotation(rotation);
 }
 
