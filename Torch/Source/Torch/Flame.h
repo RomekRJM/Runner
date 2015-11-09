@@ -26,14 +26,28 @@ public:
 
 	void AdvanceTimer();
 
-	UFUNCTION(BlueprintNativeEvent)
-	void CountdownHasFinished();
-
-	virtual void CountdownHasFinished_Implementation();
+	void ResetTimer();
 
 	FTimerHandle CountdownTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	int32 CountdownTime;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void CountdownHasFinished();
+
+	virtual void CountdownHasFinished_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddFuel();
+
+	virtual void AddFuel_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void DouseWithWater();
+
+	virtual void DouseWithWater_Implementation();
+
+	bool Wet;
 	
 };

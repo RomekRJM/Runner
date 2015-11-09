@@ -17,15 +17,14 @@ void AFlame::BeginPlay()
 {
 	Super::BeginPlay();
 	FlameParticle = FindFlameParticle();
-	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &AFlame::AdvanceTimer, 1.0f, true);
-	CountdownTime = 3;
 }
 
 // Called every frame
 void AFlame::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &AFlame::AdvanceTimer, 1.0f, true);
+	Wet = false;
 }
 
 UParticleSystemComponent* AFlame::FindFlameParticle()
@@ -50,14 +49,37 @@ void AFlame::AdvanceTimer()
 	--CountdownTime;
 	if (CountdownTime < 1)
 	{
-		//We're done counting down, so stop running the timer.
-		GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
 		CountdownHasFinished();
 	}
 }
 
+void AFlame::ResetTimer() 
+{
+	CountdownTime = 3;
+}
+
 void AFlame::CountdownHasFinished_Implementation()
 {
-	//Change to a special readout
+	GEngine->AddOnScreenDebugMessage(-1, -1, FColor::Red, TEXT("CountdownHasFinished()"));
+	AddFuel();
+}
+
+void AFlame::AddFuel_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1, -1, FColor::Red, TEXT("AddFuel()"));
+	if (!Wet) {
+		ResetTimer();
+		DouseWithWater();
+	}
+	else {
+		CountdownTime = 0;
+	}
+}
+
+void AFlame::DouseWithWater_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1, -1, FColor::Red, TEXT("DouseWithWater()"));
+	Wet = true;
 	FlameParticle->SetVisibility(false);
+	AddFuel();
 }
