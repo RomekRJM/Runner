@@ -9,7 +9,6 @@ AFlame::AFlame()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
 }
 
 // Called when the game starts or when spawned
@@ -17,14 +16,14 @@ void AFlame::BeginPlay()
 {
 	Super::BeginPlay();
 	FlameParticle = FindFlameParticle();
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &AFlame::AdvanceTimer, 1.0f, true);
+	Wet = false;
 }
 
 // Called every frame
 void AFlame::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &AFlame::AdvanceTimer, 1.0f, true);
-	Wet = false;
 }
 
 UParticleSystemComponent* AFlame::FindFlameParticle()
@@ -55,18 +54,18 @@ void AFlame::AdvanceTimer()
 
 void AFlame::ResetTimer() 
 {
-	CountdownTime = 3;
+	CountdownTime = 20;
 }
 
 void AFlame::CountdownHasFinished_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, -1, FColor::Red, TEXT("CountdownHasFinished()"));
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("CountdownHasFinished()"));
 	AddFuel();
 }
 
 void AFlame::AddFuel_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, -1, FColor::Red, TEXT("AddFuel()"));
+	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, TEXT("AddFuel()"));
 	if (!Wet) {
 		ResetTimer();
 		DouseWithWater();
@@ -81,5 +80,6 @@ void AFlame::DouseWithWater_Implementation()
 	GEngine->AddOnScreenDebugMessage(-1, -1, FColor::Red, TEXT("DouseWithWater()"));
 	Wet = true;
 	FlameParticle->SetVisibility(false);
+	GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
 	AddFuel();
 }
