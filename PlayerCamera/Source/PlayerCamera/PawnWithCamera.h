@@ -33,6 +33,13 @@ protected:
 	FVector2D CameraInput;
 	float ZoomFactor;
 	bool bZoomingIn;
+	float Speed;
+	
+	UPROPERTY(EditAnywhere)
+	float RunSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float WalkSpeed;
 
 	//Input functions
 	void MoveForward(float AxisValue);
@@ -41,5 +48,6 @@ protected:
 	void YawCamera(float AxisValue);
 	void ZoomIn();
 	void ZoomOut();
-	
+	void Run();
+	void Walk();
 };

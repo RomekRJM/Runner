@@ -23,13 +23,14 @@ APawnWithCamera::APawnWithCamera()
 
 	//Take control of the default Player
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
 }
 
 // Called when the game starts or when spawned
 void APawnWithCamera::BeginPlay()
 {
 	Super::BeginPlay();
-
+	Speed = WalkSpeed;
 }
 
 // Called every frame
@@ -72,7 +73,7 @@ void APawnWithCamera::Tick(float DeltaTime)
 		if (!MovementInput.IsZero())
 		{
 			//Scale our movement input axis values by 100 units per second
-			MovementInput = MovementInput.SafeNormal() * 100.0f;
+			MovementInput = MovementInput.GetSafeNormal() * 100.0f * Speed;
 			FVector NewLocation = GetActorLocation();
 			NewLocation += GetActorForwardVector() * MovementInput.X * DeltaTime;
 			NewLocation += GetActorRightVector() * MovementInput.Y * DeltaTime;
@@ -90,6 +91,10 @@ void APawnWithCamera::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &APawnWithCamera::ZoomIn);
 	InputComponent->BindAction("ZoomIn", IE_Released, this, &APawnWithCamera::ZoomOut);
 
+	//Hook up events for "Run"
+	InputComponent->BindAction("Run", IE_Pressed, this, &APawnWithCamera::Run);
+	InputComponent->BindAction("Run", IE_Released, this, &APawnWithCamera::Walk);
+
 	//Hook up every-frame handling for our four axes
 	InputComponent->BindAxis("MoveForward", this, &APawnWithCamera::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &APawnWithCamera::MoveRight);
@@ -100,12 +105,12 @@ void APawnWithCamera::SetupPlayerInputComponent(class UInputComponent* InputComp
 //Input functions
 void APawnWithCamera::MoveForward(float AxisValue)
 {
-	MovementInput.X = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	MovementInput.X = FMath::Clamp<float>(AxisValue, -Speed, Speed);
 }
 
 void APawnWithCamera::MoveRight(float AxisValue)
 {
-	MovementInput.Y = FMath::Clamp<float>(AxisValue, -1.0f, 1.0f);
+	MovementInput.Y = FMath::Clamp<float>(AxisValue, -Speed, Speed);
 }
 
 void APawnWithCamera::PitchCamera(float AxisValue)
@@ -126,4 +131,14 @@ void APawnWithCamera::ZoomIn()
 void APawnWithCamera::ZoomOut()
 {
 	bZoomingIn = false;
+}
+
+void APawnWithCamera::Run()
+{
+	Speed = RunSpeed;
+}
+
+void APawnWithCamera::Walk()
+{
+	Speed = WalkSpeed;
 }
