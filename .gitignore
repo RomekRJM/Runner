@@ -27,15 +27,11 @@
 *.out
 *.app
 
-# UE 4.8
-Binaries/
+# UE 4.16
 Build/
-Config/
-Content/
 Intermediate/
 Saved/
 *.sdf
-*.sln
-*.uproject
 *.v12.suo
 *.opensdf
+.vs/
