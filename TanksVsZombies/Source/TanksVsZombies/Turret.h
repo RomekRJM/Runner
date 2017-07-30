@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret")
 	class ATank* Tank;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Turret")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
 	TSubclassOf<AMissile> Projectile;
 
 
