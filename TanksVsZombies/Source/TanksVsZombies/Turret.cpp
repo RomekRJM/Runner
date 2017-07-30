@@ -25,8 +25,9 @@ ATurret::ATurret()
 // Called when the game starts or when spawned
 void ATurret::BeginPlay()
 {
+	check(GetParentComponent());
 	Super::BeginPlay();
-	Tank = Cast<ATank>(GetAttachParentActor());
+	Tank = Cast<ATank>(GetParentComponent()->GetOwner());
 	check(Tank);
 }
 
