@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Tank.h"
 #include "GameFramework/Pawn.h"
+#include "Kismet/GameplayStatics.h"
 #include "Zombie.generated.h"
 
 UCLASS()
@@ -38,6 +39,52 @@ public:
 	// Return the target Actor as a Tank, if possible. Returning NULL indicates no target, or that the target is not a Tank.
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	ATank* GetTargetAsTank();
+
+	// Zombies will call this on Tick.
+	UFUNCTION(BlueprintNativeEvent, Category = "AI")
+	void ZombieAI(float DeltaSeconds);
+	virtual void ZombieAI_Implementation(float DeltaSeconds);
+
+	// This function asks the zombie if it is in position to attack its current target. It does not actually command the zombie to attack.
+	UFUNCTION(BlueprintNativeEvent, Category = "AI")
+	bool ZombieAIShouldAttack();
+	virtual bool ZombieAIShouldAttack_Implementation();
+
+	// This can be used to animate walking.
+	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
+	void ZombieWalk(float DeltaSeconds, FVector DistanceWalkedThisFrame);
+
+	// This can be used to start attack animations.
+	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
+	void ZombieAttack(float DeltaSeconds);
+
+	//~
+	//~ New Zombie Input
+	//~
+
+	/** Add rotation equal to the yaw (in degrees) provided. */
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "AddInput"))
+	virtual void AddRotationInput(float DeltaYawDegrees);
+
+	/** Get rotation input. Returns pre-clear value. */
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "ConsumeInput"))
+	virtual float GetRotationInput();
+
+	/** Get (and clear) rotation input. Returns pre-clear value. */
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "ConsumeInput"))
+	virtual float ConsumeRotationInput();
+
+	/** Press the attack button. The pawn will know what to do with this. No arguments because it's a bool and this sets it to true. */
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "AddInput"))
+	virtual void AddAttackInput();
+
+	/** Get the status of the attack button. */
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "ConsumeInput"))
+	virtual bool GetAttackInput();
+
+	/** Get (and clear) the status of the attack button. */
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "ConsumeInput"))
+	virtual bool ConsumeAttackInput();
 
 private:
 	/* The actor we're targeting. Will be NULL if there is no target. */
@@ -92,5 +139,12 @@ protected:
 	/** Game time in seconds, when Zombie will be allowed to attack again.. */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Zombie", meta = (ClampMin = "0.0"))
 	float AttackAvailableTime;
+
+private:
+	// Current rotation input.
+	float YawInput;
+
+	// Current attack button status.
+	uint32 bAttackInput : 1;
 	
 };
