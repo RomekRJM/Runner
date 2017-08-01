@@ -11,6 +11,7 @@ AMissile::AMissile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Speed = 200.0f;
+	Radius = 20.0f;
 }
 
 // Called when the game starts or when spawned
@@ -18,8 +19,7 @@ void AMissile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FTimerHandle DummyTimerHandle;
-	GetWorldTimerManager().SetTimer(DummyTimerHandle, this, &AMissile::Explode, 1.0f);
+	GetWorldTimerManager().SetTimer(ExplodeTimerHandle, this, &AMissile::Explode, 1.0f);
 }
 
 // Called every frame
@@ -27,11 +27,34 @@ void AMissile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	FVector Loc = GetActorLocation();
-	Loc += (DeltaTime * Speed) * GetTransform().GetUnitAxis(EAxis::X);
-	SetActorLocation(Loc);
+	FVector DesiredEndLoc = Loc + ((DeltaTime * Speed) * GetTransform().GetUnitAxis(EAxis::X));
+
+	FHitResult OutHit;
+	FCollisionShape CollisionShape;
+	CollisionShape.SetCapsule(Radius, 200.0f);
+	if (UWorld* World = GetWorld())
+	{
+		if (World->SweepSingleByProfile(OutHit, Loc, DesiredEndLoc, FQuat::Identity, MovementCollisionProfile, CollisionShape))
+		{
+			SetActorLocation(OutHit.Location);
+			Explode();
+		}
+		else
+		{
+			SetActorLocation(DesiredEndLoc);
+		}
+	}
 }
 
-void AMissile::Explode_Implementation()
+void AMissile::Explode()
+{
+	GetWorldTimerManager().ClearTimer(ExplodeTimerHandle);
+	SetActorEnableCollision(false);
+	OnExplode();
+}
+
+
+void AMissile::OnExplode_Implementation()
 {
 	Destroy();
 }

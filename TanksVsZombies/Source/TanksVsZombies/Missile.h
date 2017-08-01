@@ -21,14 +21,27 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
+	/** Missile move speed. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	float Speed;
 
+	/** Missile radius for collisions. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	float Radius;
+
+	/** Describe what this property hits. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	FName MovementCollisionProfile;
+
 protected:
+	void Explode();
+
+	FTimerHandle ExplodeTimerHandle;
+
 	/** What to do when the projectile explodes. The base version just destroys the projectile. */
 	UFUNCTION(BlueprintNativeEvent, Category = "Projectile")
-	void Explode();
-	virtual void Explode_Implementation();
+	void OnExplode();
+	virtual void OnExplode_Implementation();
 
 	
 	
