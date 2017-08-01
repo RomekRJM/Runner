@@ -33,6 +33,13 @@ void AZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	ZombieAI(DeltaTime);
+
+	// Clear out leftover movement.
+	ConsumeMovementInputVector();
+	ConsumeRotationInput();
+	ConsumeAttackInput();
+
 }
 
 // Called to bind functionality to input
