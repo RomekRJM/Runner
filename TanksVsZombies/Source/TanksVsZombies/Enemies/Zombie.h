@@ -87,7 +87,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "ConsumeInput"))
 	virtual bool ConsumeAttackInput();
 
-	virtual void ReceiveDamage(int32 IncomingDamage) override;
+	virtual void ReceiveDamage(int32 IncomingDamage, EDamageType DamageType) override;
 	virtual int32 GetHealthRemaining() override;
 
 private:

@@ -39,9 +39,9 @@ void AMissile::Tick(float DeltaTime)
 		if (World->SweepSingleByProfile(OutHit, Loc, DesiredEndLoc, FQuat::Identity, MovementCollisionProfile, CollisionShape))
 		{
 			SetActorLocation(OutHit.Location);
-a			if (IDamageInterface* DamageActor = Cast<IDamageInterface>(OutHit.Actor.Get()))
+			if (IDamageInterface* DamageActor = Cast<IDamageInterface>(OutHit.Actor.Get()))
 			{
-				DamageActor->ReceiveDamage(DirectDamage);
+				DamageActor->ReceiveDamage(DirectDamage, EDamageType::HitWithMissile);
 			}
 			Explode();
 		}

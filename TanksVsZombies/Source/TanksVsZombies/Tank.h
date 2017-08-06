@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "DamageInterface.h"
 #include "TankStatics.h"
 #include "Tank.generated.h"
 
@@ -41,7 +43,7 @@ private:
 
 
 UCLASS()
-class TANKSVSZOMBIES_API ATank : public APawn
+class TANKSVSZOMBIES_API ATank : public APawn, public IDamageInterface
 {
 	GENERATED_BODY()
 
@@ -63,8 +65,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Tank")
 	const FTankInput& GetCurrentInput() { return TankInput;  };
 
+	//~ Begin IDamageInterface
+	virtual void ReceiveDamage(int32 IncomingDamage, EDamageType DamageType) override;
+	virtual int32 GetHealthRemaining() override { return Health; }
+	//~ End IDamageInterface
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Tank")
+	void TankDie(EDamageType DamageType);
+
 private:
-	//
 	void MoveX(float AxisValue);
 	void MoveY(float AxisValue);
 	void Fire1Pressed();
@@ -76,6 +85,10 @@ private:
 	// Which way tank is facing
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
 	UArrowComponent* TankDirection;
+
+	// Collision body for the tank
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
+	UBoxComponent* TankBody;
 
 	// Sprite for the tank body.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank", meta = (AllowPrivateAccess = "true"))
@@ -106,4 +119,13 @@ protected:
 	// Acceleration for our tank, when player is trying to move or change directions.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tank", meta = (ClampMin = "0.0"))
 	float MoveAccel;
+
+	// Collision profile for detecting (via overlaps) the things we can crush.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tank")
+	FName CrushCollisionProfile;
+
+	// Current health. Might want to cap this with a MaxHealth variable in the future.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tank", meta = (ClampMin = "1.0"))
+	int32 Health;
 };
+

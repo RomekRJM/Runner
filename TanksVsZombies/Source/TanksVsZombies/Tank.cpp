@@ -49,6 +49,10 @@ ATank::ATank()
 	TankDirection = CreateDefaultSubobject<UArrowComponent>(TEXT("TankDirection"));
 	TankDirection->SetupAttachment(RootComponent);
 
+	TankBody = CreateDefaultSubobject<UBoxComponent>(TEXT("TankBody"));
+	TankBody->SetupAttachment(TankDirection);
+	TankBody->SetBoxExtent(FVector(40.0f, 40.0f, 100.0f));
+
 	TankSprite = CreateDefaultSubobject<UPaperSpriteComponent>(TEXT("TankSprite"));
 	TankSprite->SetupAttachment(TankDirection);
 
@@ -71,7 +75,7 @@ ATank::ATank()
 	CameraComponent->bUsePawnControlRotation = false;
 	CameraComponent->ProjectionMode = ECameraProjectionMode::Orthographic;
 	CameraComponent->OrthoWidth = 1024.0f;
-	// Corrected from livestream: The aspect ratio is 4:3, not 3:4.
+
 	CameraComponent->AspectRatio = 4.0f / 3.0f;
 	CameraComponent->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
@@ -80,6 +84,8 @@ ATank::ATank()
 	MoveSpeed = 100.0f;
 	MoveAccel = 200.0f;
 	YawSpeed = 180.0f;
+
+	CrushCollisionProfile = TEXT("Tank:Crush");
 }
 
 // Called when the game starts or when spawned
@@ -98,6 +104,7 @@ void ATank::Tick(float DeltaSeconds)
 
 
 	// Move the tank
+	if (GetHealthRemaining() >= 0)
 	{
 		FVector DesiredMovementDirection = FVector(TankInput.MovementInput.X, TankInput.MovementInput.Y, 0.0f);
 		if (!DesiredMovementDirection.IsNearlyZero())
@@ -150,29 +157,73 @@ void ATank::Tick(float DeltaSeconds)
 
 			}
 
-			// Move the tank
+			// Move the tank.
 			{
 				FVector MovementDirection = TankDirection->GetForwardVector() * (bReverse ? -1.0f : 1.0f);
-				FVector Pos = GetActorLocation();
+				FVector StartPos = GetActorLocation();
+				FVector Pos = StartPos;
 				Pos.X += MovementDirection.X * 100.0f * DeltaSeconds;
 				Pos.Y += MovementDirection.Y * 100.0f * DeltaSeconds;
+				if (UWorld* World = GetWorld())
+				{
+					TArray<FHitResult> HitResults;
+					FVector BoxSize = TankBody->GetScaledBoxExtent();
+					FCollisionShape CollisionShape;
+					CollisionShape.SetBox(BoxSize);
+					World->SweepMultiByProfile(HitResults, StartPos, Pos, TankBody->GetComponentRotation().Quaternion(), CrushCollisionProfile, CollisionShape);
+					for (const FHitResult& HitResult : HitResults)
+					{
+						if (IDamageInterface* DamageTarget = Cast<IDamageInterface>(HitResult.Actor.Get()))
+						{
+							// Getting crushed by a tank is pretty final. Damage is always enough to smoosh the raspberry jelly out of a zombie.
+							int32 TargetHealth = DamageTarget->GetHealthRemaining();
+							if (TargetHealth >= 0)
+							{
+								DamageTarget->ReceiveDamage(TargetHealth, EDamageType::Crushed);
+							}
+						}
+					}
+				}
 				SetActorLocation(Pos);
 			}
 		}
 	}
 }
 
-// Called to bind functionality to input
-void ATank::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void ATank::ReceiveDamage(int32 IncomingDamage, EDamageType DamageType)
 {
-	Super::SetupPlayerInputComponent(InputComponent);
+	if (IncomingDamage >= Health)
+	{
+		if (Health >= 0)
+		{
+			Health = -1;
+			TankDie(DamageType);
+		}
+		return;
+	}
+	Health -= IncomingDamage;
+}
 
-	InputComponent->BindAxis("MoveX", this, &ATank::MoveX);
-	InputComponent->BindAxis("MoveY", this, &ATank::MoveY);
-	InputComponent->BindAction("Fire1", EInputEvent::IE_Pressed, this, &ATank::Fire1Pressed);
-	InputComponent->BindAction("Fire1", EInputEvent::IE_Released, this, &ATank::Fire1Released);
-	InputComponent->BindAction("Fire2", EInputEvent::IE_Pressed, this, &ATank::Fire2Pressed);
-	InputComponent->BindAction("Fire2", EInputEvent::IE_Released, this, &ATank::Fire2Released);
+void ATank::TankDie_Implementation(EDamageType DamageType)
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		// TODO: Manage extra lives?
+		PC->RestartLevel();
+	}
+}
+
+// Called to bind functionality to input
+void ATank::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveX", this, &ATank::MoveX);
+	PlayerInputComponent->BindAxis("MoveY", this, &ATank::MoveY);
+	PlayerInputComponent->BindAction("Fire1", EInputEvent::IE_Pressed, this, &ATank::Fire1Pressed);
+	PlayerInputComponent->BindAction("Fire1", EInputEvent::IE_Released, this, &ATank::Fire1Released);
+	PlayerInputComponent->BindAction("Fire2", EInputEvent::IE_Pressed, this, &ATank::Fire2Pressed);
+	PlayerInputComponent->BindAction("Fire2", EInputEvent::IE_Released, this, &ATank::Fire2Released);
 }
 
 void ATank::MoveX(float AxisValue)
