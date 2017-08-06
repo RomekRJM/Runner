@@ -69,7 +69,7 @@ void ATurret::Tick(float DeltaTime)
 
 			// Handle input.
 			const FTankInput& CurrentInput = Tank->GetCurrentInput();
-			if (CurrentInput.bFire1 && Projectile)
+			if (CurrentInput.bFire1 && Projectiles.Num())
 			{
 				if (UWorld* World = GetWorld())
 				{
@@ -79,10 +79,13 @@ void ATurret::Tick(float DeltaTime)
 						FVector Loc = TurretSprite->GetSocketLocation(MuzzleSocketName);
 						FRotator Rot = TurretDirection->GetComponentRotation();
 
-						if (AActor* NewProjectile = World->SpawnActor(Projectile))
+						for (TSubclassOf<AActor> Projectile : Projectiles)
 						{
-							NewProjectile->SetActorLocation(Loc);
-							NewProjectile->SetActorRotation(Rot);
+							if (AActor* NewProjectile = World->SpawnActor(Projectile))
+							{
+								NewProjectile->SetActorLocation(Loc);
+								NewProjectile->SetActorRotation(Rot);
+							}
 						}
 
 						// Set the cooldown timer.

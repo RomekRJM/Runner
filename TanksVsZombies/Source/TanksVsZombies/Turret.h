@@ -38,7 +38,7 @@ protected:
 	class ATank* Tank;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret")
-	TSubclassOf<AMissile> Projectile;
+	TArray<TSubclassOf<AMissile>> Projectiles;
 
 
 private:

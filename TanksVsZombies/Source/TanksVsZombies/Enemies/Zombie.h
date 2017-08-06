@@ -59,6 +59,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
 	void ZombieAttack(float DeltaSeconds);
 
+	// This can be used to handle death from different sources.
+	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
+	void ZombieDie(EDamageType DamageType);
+
 	//~
 	//~ New Zombie Input
 	//~

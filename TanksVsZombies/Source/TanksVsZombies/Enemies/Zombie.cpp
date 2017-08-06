@@ -102,7 +102,7 @@ void AZombie::ZombieAI_Implementation(float DeltaSeconds)
 				{
 					if (ATank* TankTarget = GetTargetAsTank())
 					{
-						//TankTarget->DamageHealth(10.0f);
+						TankTarget->ReceiveDamage(10.0f, EDamageType::ZombieSlap);
 						if (APlayerController* PC = Cast<APlayerController>(TankTarget->GetController()))
 						{
 							PC->ClientPlayCameraShake(HitShake, 1.0f);
@@ -194,14 +194,16 @@ bool AZombie::ConsumeAttackInput()
 
 void AZombie::ReceiveDamage(int32 IncomingDamage, EDamageType DamageType)
 {
-	if (IncomingDamage >= 0)
+	if (IncomingDamage >= Health)
 	{
-		Health -= IncomingDamage;
-		if (Health <= 0)
+		if (Health >= 0)
 		{
-			Destroy();
+			Health = -1;
+			ZombieDie(DamageType);
 		}
+		return;
 	}
+	Health -= IncomingDamage;
 }
 
 int32 AZombie::GetHealthRemaining()

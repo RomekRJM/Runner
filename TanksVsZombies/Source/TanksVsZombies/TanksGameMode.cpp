@@ -2,6 +2,7 @@
 
 #include "TanksGameMode.h"
 
-
-
-
+ATanksGameMode::ATanksGameMode()
+{
+	PlayInZPlane = 0.0f;
+}

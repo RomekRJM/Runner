@@ -14,7 +14,13 @@ class TANKSVSZOMBIES_API ATanksGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
-	
+
+public:
+	ATanksGameMode();
+
+	// Every Zombie game actor should snap to this Z value during BeginPlay. E.g. zombies, tanks, missiles. Default is 0.
+	UPROPERTY(EditAnywhere)
+	float PlayInZPlane;
 	
 	
 };

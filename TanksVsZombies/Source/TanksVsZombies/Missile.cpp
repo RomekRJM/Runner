@@ -33,21 +33,25 @@ void AMissile::Tick(float DeltaTime)
 
 	FHitResult OutHit;
 	FCollisionShape CollisionShape;
-	CollisionShape.SetCapsule(Radius, 200.0f);
-	if (UWorld* World = GetWorld())
+
+	if (Radius > 0.0f)
 	{
-		if (World->SweepSingleByProfile(OutHit, Loc, DesiredEndLoc, FQuat::Identity, MovementCollisionProfile, CollisionShape))
+		if (UWorld* World = GetWorld())
 		{
-			SetActorLocation(OutHit.Location);
-			if (IDamageInterface* DamageActor = Cast<IDamageInterface>(OutHit.Actor.Get()))
+			CollisionShape.SetCapsule(Radius, 200.0f);
+			if (World->SweepSingleByProfile(OutHit, Loc, DesiredEndLoc, FQuat::Identity, MovementCollisionProfile, CollisionShape))
 			{
-				DamageActor->ReceiveDamage(DirectDamage, EDamageType::HitWithMissile);
+				SetActorLocation(OutHit.Location);
+				if (IDamageInterface* DamageActor = Cast<IDamageInterface>(OutHit.Actor.Get()))
+				{
+					DamageActor->ReceiveDamage(DirectDamage, EDamageType::HitWithMissile);
+				}
+				Explode();
 			}
-			Explode();
-		}
-		else
-		{
-			SetActorLocation(DesiredEndLoc);
+			else
+			{
+				SetActorLocation(DesiredEndLoc);
+			}
 		}
 	}
 }

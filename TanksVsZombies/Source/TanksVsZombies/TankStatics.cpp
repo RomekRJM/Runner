@@ -31,3 +31,33 @@ bool UTankStatics::FindLookAtAngle2D(const FVector2D& Start, const FVector2D& Ta
 
 	return false;
 }
+
+ATanksGameMode* UTankStatics::GetTanksGameMode(UObject* WorldContextObject)
+{
+	return Cast<ATanksGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+}
+
+void UTankStatics::PutInZPlane(AActor* ActorToMove)
+{
+	if (ATanksGameMode* GM = UTankStatics::GetTanksGameMode(ActorToMove))
+	{
+		FVector Loc = ActorToMove->GetActorLocation();
+		Loc.Z = GM->PlayInZPlane;
+		ActorToMove->SetActorLocation(Loc);
+	}
+}
+
+void UTankStatics::PlayFlipbook(UPaperFlipbookComponent* Component, UPaperFlipbook* NewFlipbook, bool bLooping, float PlayRate /*= 1.0f*/, bool bPlayFromStart /*= false*/)
+{
+	Component->SetFlipbook(NewFlipbook);
+	Component->SetLooping(bLooping);
+	Component->SetPlayRate(PlayRate);
+	if (bPlayFromStart)
+	{
+		Component->PlayFromStart();
+	}
+	else
+	{
+		Component->Play();
+	}
+}
