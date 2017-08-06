@@ -10,7 +10,7 @@ AZombie::AZombie()
 	PrimaryActorTick.bCanEverTick = true;
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-	Health = 100.0f;
+	Health = 10.0f;
 	SightDistance = 500.0f;
 	SightAngle = 60.0f;
 	YawSpeed = 90.0f;
@@ -190,4 +190,21 @@ bool AZombie::ConsumeAttackInput()
 	bool bRetVal = bAttackInput;
 	bAttackInput = false;
 	return bRetVal;
+}
+
+void AZombie::ReceiveDamage(int32 IncomingDamage)
+{
+	if (IncomingDamage >= 0)
+	{
+		Health -= IncomingDamage;
+		if (Health <= 0)
+		{
+			Destroy();
+		}
+	}
+}
+
+int32 AZombie::GetHealthRemaining()
+{
+	return Health;
 }

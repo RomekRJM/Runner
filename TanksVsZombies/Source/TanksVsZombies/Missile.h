@@ -29,6 +29,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	float Radius;
 
+	/** Missile damage. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	int DirectDamage;
+
 	/** Describe what this property hits. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	FName MovementCollisionProfile;

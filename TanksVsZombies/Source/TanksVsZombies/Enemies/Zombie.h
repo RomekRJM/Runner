@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Tank.h"
+#include "DamageInterface.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Zombie.generated.h"
 
 UCLASS()
-class TANKSVSZOMBIES_API AZombie : public APawn
+class TANKSVSZOMBIES_API AZombie : public APawn, public IDamageInterface
 {
 	GENERATED_BODY()
 
@@ -85,6 +86,9 @@ public:
 	/** Get (and clear) the status of the attack button. */
 	UFUNCTION(BlueprintCallable, Category = "Pawn|Input", meta = (Keywords = "ConsumeInput"))
 	virtual bool ConsumeAttackInput();
+
+	virtual void ReceiveDamage(int32 IncomingDamage) override;
+	virtual int32 GetHealthRemaining() override;
 
 private:
 	/* The actor we're targeting. Will be NULL if there is no target. */

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Missile.h"
+#include "DamageInterface.h"
 #include "Tank.h"
 
 
@@ -12,6 +13,7 @@ AMissile::AMissile()
 
 	Speed = 200.0f;
 	Radius = 20.0f;
+	DirectDamage = 5;
 }
 
 // Called when the game starts or when spawned
@@ -37,6 +39,10 @@ void AMissile::Tick(float DeltaTime)
 		if (World->SweepSingleByProfile(OutHit, Loc, DesiredEndLoc, FQuat::Identity, MovementCollisionProfile, CollisionShape))
 		{
 			SetActorLocation(OutHit.Location);
+a			if (IDamageInterface* DamageActor = Cast<IDamageInterface>(OutHit.Actor.Get()))
+			{
+				DamageActor->ReceiveDamage(DirectDamage);
+			}
 			Explode();
 		}
 		else
