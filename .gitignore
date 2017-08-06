@@ -28,6 +28,8 @@
 *.app
 
 # UE 4.16
+
+Binaries/
 Build/
 Intermediate/
 Saved/
