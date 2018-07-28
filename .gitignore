@@ -28,7 +28,6 @@
 *.app
 
 # UE 4.16
-
 Binaries/
 Build/
 Intermediate/
@@ -37,3 +36,4 @@ Saved/
 *.v12.suo
 *.opensdf
 .vs/
+HTML5/
